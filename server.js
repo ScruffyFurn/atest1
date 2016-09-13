@@ -1,25 +1,11 @@
 ﻿/**************************************************
 ** GAME SERVER **
 This holds all the logic for the game server.
-To run: Type the follow in a cmd window with Admin privs
+To run: Type the follow in a cmd window with Admin 
+privs
     node server.js  
 
-Copyright (c) 2014, Mickey "ScruffyFurn" MacDonald
-All rights reserved.
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted. 
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
-ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+** Coded by Mickey "ScruffyFurn" MacDonald  2014 **
 **************************************************/
 
 
@@ -39,7 +25,8 @@ var port = process.env.PORT || 80;
 /**************************************************
 ** Variables
 **************************************************/
-var players;
+var 
+    players;
 
 /**************************************************
 ** Init function
@@ -63,7 +50,6 @@ server.listen(port, function () {
 **************************************************/
 var setEventHandlers = function () {
     io.sockets.on("connection", onSocketConnection);
-    //io.sockets.on("new player", onNewPlayer);
 };
 
 /**************************************************
@@ -106,12 +92,8 @@ function onNewPlayer(data) {
     position data sent by the connected client. 
     The identification number is stored for future 
     reference.*/
-    var newPlayer = new Player();
+    var newPlayer = new Player(data.x, data.y);
     newPlayer.id = this.id;
-    newPlayer.setX(data.x);
-    newPlayer.setY(data.y);
-    
-    util.log("Data X: " + data.x + " Data Y: " + data.y);
     
     //Tell the other players about this new player
     this.broadcast.emit("new player",
@@ -124,11 +106,8 @@ function onNewPlayer(data) {
     var i, existingPlayer;
     for (i = 0; i < players.length; i++) {
         existingPlayer = players[i];
-        util.log("Existing player: " + i + " ID " + existingPlayer.id + " X " + existingPlayer.getX() + " Y " + existingPlayer.getY());
-        
-        
         this.emit("new player",
-               {
+                  {
             id: existingPlayer.id,
             x: existingPlayer.getX(),
             y: existingPlayer.getY()
@@ -137,9 +116,6 @@ function onNewPlayer(data) {
     
     //Add this new player to the players array
     players.push(newPlayer);
-
-    //util.log("New Player ID: " + newPlayer.id + " New player x: " + newPlayer.getX() + " y: " + newPlayer.getY() + " players length " + players.length);
-    
 };
 
 /**************************************************
@@ -149,26 +125,22 @@ function onMovePlayer(data) {
     //Select player to move
     var movePlayer = playerById(this.id);
     
-    
-    
     //Display message if id is not found in array
     if (!movePlayer) {
         util.log("Player not found: " + this.id);
         return;
     }    ;
-    //Set the players input 
-    movePlayer.setInput(data.input);
+    
+    //Set selected players position data via setters
     movePlayer.setX(data.x);
     movePlayer.setY(data.y);
     
-    //util.log("ID: " + data.id +" Moved X: " +  data.x + " Moved Y: " + data.y);
-    
-    
     //Tell the other players about the movement
     this.broadcast.emit("move player",
-    {
+                        {
         id: movePlayer.id,
-        input : movePlayer.getInput()
+        x: movePlayer.getX(),
+        y: movePlayer.getY()
     });
 
 };
